@@ -4,3 +4,7 @@ node_modules/
 build/
 tmp/
 temp/
+dist/
+/src/data-source.ts
+.env
+package.json

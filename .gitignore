@@ -7,4 +7,3 @@ temp/
 dist/
 /src/data-source.ts
 .env
-package.json

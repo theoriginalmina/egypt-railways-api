@@ -22,6 +22,21 @@ export class User extends BaseEntity {
 	@Column()
 		password: string;
 
+	@Column({ nullable: true })
+		firstName: string;
+
+	@Column({ nullable: true })
+		lastName:string;
+
+	@Column({ nullable: true, type:"varchar", unique:true })
+		phoneNumber: number;
+
+	@Column({ nullable: true })
+		egyptian: boolean;
+
+	@Column({ nullable: true })
+		active: false;
+
 	@CreateDateColumn()
 		createdAt: string;
 }

@@ -6,12 +6,12 @@ import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/Hello";
 import { AppDataSource } from "./data-source";
 import { UserResolver } from "./resolvers/User";
+import { createClient } from "redis";
+import session from "express-session";
+import connectRedis from "connect-redis";
+import { MyContext } from "./types/MyContext";
 
 (async () => {
-	const app = express();
-
-	const PORT = process.env.PORT || 5001;
-
 	AppDataSource.initialize()
 		.then(() => {
 			if (process.env.NODE_ENV === "development") {
@@ -24,6 +24,40 @@ import { UserResolver } from "./resolvers/User";
 			}
 		});
 
+	const app = express();
+
+	// app.use(helmet());
+
+	// app.set("trust proxy", true);
+
+	// app.use(cors());
+
+	const RedisStore = connectRedis(session);
+	const redisClient = createClient({ legacyMode: true });
+
+	redisClient.connect().catch(console.error);
+
+	app.use(
+		session({
+			name: "qid",
+			store: new RedisStore({
+				client: redisClient,
+				disableTouch: true,
+			}),
+			cookie: {
+				maxAge: 1000 * 60 * 60 * 24 * 7, // One Week
+				httpOnly: true,
+				sameSite: "lax",
+				secure: false,
+			},
+			saveUninitialized: false,
+			secret: process.env.SECRET || "randomsecret",
+			resave: false,
+		})
+	);
+
+	const PORT = process.env.PORT || 5001;
+
 	// Main Endpoint
 	app.get("/", (_req, res) => {
 		res.send("Egypt Railways API");
@@ -34,12 +68,22 @@ import { UserResolver } from "./resolvers/User";
 			resolvers: [HelloResolver, UserResolver],
 			validate: false,
 		}),
-		context: ({ req, res }) => ({ req, res }),
+		context: ({ req, res }): MyContext => ({ req, res }),
+		csrfPrevention: true,
 	});
 
 	await apolloServer.start();
 
-	apolloServer.applyMiddleware({ app });
+	// const corsOptions = {
+	// 	origin: "https://studio.apollographql.com",
+	// 	credentials: true,
+	// };
+
+	apolloServer.applyMiddleware({
+		app,
+		// cors: corsOptions,
+		// path: "/graphql",
+	});
 
 	app.listen(PORT, () => {
 		if (process.env.NODE_ENV === "development") {
@@ -47,24 +91,3 @@ import { UserResolver } from "./resolvers/User";
 		}
 	});
 })();
-
-// import { AppDataSource } from "./data-source"
-// import { User } from "./entity/User"
-
-// AppDataSource.initialize().then(async () => {
-
-//     console.log("Inserting a new user into the database...")
-//     const user = new User()
-//     user.firstName = "Timber"
-//     user.lastName = "Saw"
-//     user.age = 25
-//     await AppDataSource.manager.save(user)
-//     console.log("Saved a new user with id: " + user.id)
-
-//     console.log("Loading users from the database...")
-//     const users = await AppDataSource.manager.find(User)
-//     console.log("Loaded users: ", users)
-
-//     console.log("Here you can setup and run express / fastify / any other framework.")
-
-// }).catch(error => console.log(error))

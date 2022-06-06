@@ -3,7 +3,6 @@ import "dotenv/config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { HelloResolver } from "./resolvers/Hello";
 import { AppDataSource } from "./data-source";
 import { UserResolver } from "./resolvers/User";
 import { createClient } from "redis";
@@ -65,7 +64,7 @@ import { MyContext } from "./types/MyContext";
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [HelloResolver, UserResolver],
+			resolvers: [UserResolver],
 			validate: false,
 		}),
 		context: ({ req, res }): MyContext => ({ req, res }),

@@ -41,18 +41,35 @@ afterAll(async () => {
 });
 
 describe("Register", () => {
-	it("Should return error when empty data are passed", async () => {
+	it("Should return error when empty email is passed", async () => {
 		const testUser = {
 			email: "",
 			password: "",
 		};
 
-		const registerRespone = await grahpqlTestCall(registerMutation, testUser);
+		const registerResponse = await grahpqlTestCall(registerMutation, testUser);
 
-		expect(registerRespone.data?.register).toEqual({
+		expect(registerResponse.data?.register).toEqual({
 			errors: {
-				field: "email" || "password",
-				message: "Email can't be empty" || "Password can't be empty",
+				field: "email",
+				message: "Email can't be empty",
+			},
+			registered: false,
+		});
+	});
+
+	it("Should return error when empty password is passed", async () => {
+		const testUser = {
+			email: "test@test.com",
+			password: "",
+		};
+
+		const registerResponse = await grahpqlTestCall(registerMutation, testUser);
+
+		expect(registerResponse.data?.register).toEqual({
+			errors: {
+				field: "password",
+				message: "Password can't be empty",
 			},
 			registered: false,
 		});
@@ -138,39 +155,38 @@ describe("Register", () => {
 });
 
 describe("Login", () => {
-	it("Should return error when empty data are passed", async () => {
-		let testUser;
-		for (let i = 0; i < 2; i++) {
-			if (i === 0) {
-				testUser = {
-					email: "",
-					password: "",
-				};
-				const registerResponse = await grahpqlTestCall(loginMutation, testUser);
+	it("Should return error when empty email is passed", async () => {
+		const testUser = {
+			email: "",
+			password: "",
+		};
 
-				expect(registerResponse.data?.login).toEqual({
-					errors: {
-						field: "email",
-						message: "Email can't be empty",
-					},
-					user: null,
-				});
-			} else if (i === 1) {
-				testUser = {
-					email: "test@test.com",
-					password: "",
-				};
-				const registerResponse = await grahpqlTestCall(loginMutation, testUser);
+		const loginResponse = await grahpqlTestCall(registerMutation, testUser);
 
-				expect(registerResponse.data?.login).toEqual({
-					errors: {
-						field: "password",
-						message: "Password can't be empty",
-					},
-					user: null,
-				});
-			}
-		}
+		expect(loginResponse.data?.register).toEqual({
+			errors: {
+				field: "email",
+				message: "Email can't be empty",
+			},
+			registered: false,
+		});
+	});
+
+	it("Should return error when empty password is passed", async () => {
+		const testUser = {
+			email: "test@test.com",
+			password: "",
+		};
+
+		const loginResponse = await grahpqlTestCall(registerMutation, testUser);
+
+		expect(loginResponse.data?.register).toEqual({
+			errors: {
+				field: "password",
+				message: "Password can't be empty",
+			},
+			registered: false,
+		});
 	});
 
 	it("Should return error when wrong email is passed", async () => {

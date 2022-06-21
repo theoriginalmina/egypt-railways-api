@@ -5,7 +5,10 @@ import {
 	Column,
 	BaseEntity,
 	CreateDateColumn,
+	// OneToOne,
+	// JoinColumn,
 } from "typeorm";
+// import { Egyptian } from "./Egyptian";
 
 // prettier-ignore
 @ObjectType()
@@ -35,8 +38,12 @@ export class User extends BaseEntity {
 		egyptian: boolean;
 
 	@Column({ nullable: true })
-		active: false;
+		active: boolean;
 
 	@CreateDateColumn()
 		createdAt: string;
+
+	// @OneToOne(() => Egyptian)
+	// @JoinColumn()
+	// 	egypt: Egyptian;
 }

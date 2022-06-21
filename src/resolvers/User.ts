@@ -56,7 +56,7 @@ export class UserResolver {
 		@Arg("email") email: string,
 		@Arg("password") password: string
 	): Promise<RegisterResponse> {
-
+		
 		if(email.length === 0) {
 			return {
 				errors: {
@@ -64,13 +64,12 @@ export class UserResolver {
 					message: "Email can't be empty"
 				},
 				registered: false
-
 			};
 		}
 		if(password.length === 0) {
 			return {
 				errors: {
-					field:"email",
+					field:"password",
 					message: "Password can't be empty"
 				},
 				registered: false
@@ -187,11 +186,32 @@ export class UserResolver {
 	// prettier-ignore
 	@Mutation(() => Boolean)
 	async activeAccount (
-		@Arg("id") id: number
-		// @Arg("firstName") firstName: string
+		@Arg("id") id: number,
+		@Arg("firstName") firstName: string,
+		@Arg("lastName") lastName: string,
+		@Arg("phoneNumber") phoneNumber: number,
+		@Arg("egyptian") egyptian: boolean,
+			// @Arg("nationalID") nationalID: string,
 	) {
-		const user = await User.findOne({ where: { id } });
+		// const user = await User.update(id, {
+		// 	firstName,
+		// 	lastName,
+		// 	phoneNumber,
+		// 	egyptian,
+		// 	active: true,
 
-		console.info(user);
+		// });
+		const user = await User.findOne({ where: { id } });
+		if(!user) {
+			throw new Error("Now User");
+		}
+
+		user.firstName = firstName;
+		user.lastName = lastName;
+		user.phoneNumber = phoneNumber;
+		user.egyptian = egyptian;
+		user.active = true;
+		// user.egypt.nationalID =  nationalID;
 	}
 }
+// select id, email, "firstName", "lastName", "phoneNumber", egyptian, active, "createdAt", "foreignKey" from users;
